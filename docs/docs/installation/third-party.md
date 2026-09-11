@@ -90,7 +90,7 @@ Ofelia should keep running and restarting the configarr in your defined interval
 ## Synology NAS {#synology}
 
 For scheduled runs on Synology you can use the [Task Scheduler](https://kb.synology.com/en-au/DSM/help/DSM/AdminCenter/system_taskscheduler?version=7) in order to run configarr in a cron way.
-First make sure to have run the configarr container succesfully at least once, either via cli or via the Synology Container Manager, and is sitting in a "stopped" state. Via cli this would be something like this:
+First make sure to have run the configarr container successfully at least once, either via cli or via the Synology Container Manager. The container should then have exited and will be sitting in a "stopped" state. For this to work, make sure to not use auto-restart (`restart: no`). Via cli this would be something like this:
 
 ```
 sudo docker run -d --name=configarr -e TZ=[YOUR-TIMEZONE] -v /[SYNOLOGY-VOLUME]/[SYNOLOGY-SHARED-FOLDER-OF-YOUR-DOCKER-CONTAINERS]/[CONFIGARR-SUBFOLDER]:/app/config ghcr.io/raydak-labs/configarr:[REQUIRED-VERSION]
@@ -104,7 +104,7 @@ sudo docker run -d --name=configarr -e TZ=Europe/Amsterdam -v /volume1/docker/co
 
 To then configure a scheduled task in DSM 7 you go to Control Panel - Services - Task Scheduler. From there you can create a new Scheduled Task (User-defined script).
 As Synology requires root permission to start docker containers, "root" should be chosen as the user. Then within the Schedule tab you can choose your preferred frequency to run configarr.
-For the actual user-defined script you indicate to start the configarr container that is in a stopped state. This is done by container name (`configarr` in this example), so make sure to use the same name as you used for the stopped container. Moreover, be sure to NOT include `sudo` in your command (as your already run the command with root permissions). Like so:
+For the actual user-defined script you indicate to start the configarr container that is in a stopped state. This is done by container name (`configarr` in this example), so make sure to use the same name as you used for the stopped container. Moreover, be sure to NOT include `sudo` in your command (as you are already running the command with root permissions). Like so:
 
 ```
 docker container start configarr
@@ -112,6 +112,7 @@ docker container start configarr
 
 After clicking "OK" it will ask for your password, given that you created a scheduled script with root permissions. When you're done you can perform a run manually to check if everything works by selecting the task and press "Run".
 Afterwards you can view the logs of all runs in Synology Container Manager.
+Note that the `start` command will not pull a new image. For a version bump, the container will have to be recreated.
 
 ## NixOS Module <span className="theme-doc-version-badge badge badge--secondary configarr-badge">1.18.0</span> {#nixos}
 
